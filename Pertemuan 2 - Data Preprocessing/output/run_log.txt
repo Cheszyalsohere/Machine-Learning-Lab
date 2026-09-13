@@ -1,0 +1,141 @@
+PROGRAM DATA PREPROCESSING - NIM 434241079
+Memproses 3 dataset sekaligus...
+
+
+======================================================================
+DATASET: CC GENERAL.csv
+======================================================================
+Ukuran data (baris, kolom): (8950, 18)
+
+5 data teratas:
+  CUST_ID      BALANCE  BALANCE_FREQUENCY  PURCHASES  ONEOFF_PURCHASES  INSTALLMENTS_PURCHASES  CASH_ADVANCE  PURCHASES_FREQUENCY  ONEOFF_PURCHASES_FREQUENCY  PURCHASES_INSTALLMENTS_FREQUENCY  CASH_ADVANCE_FREQUENCY  CASH_ADVANCE_TRX  PURCHASES_TRX  CREDIT_LIMIT     PAYMENTS  MINIMUM_PAYMENTS  PRC_FULL_PAYMENT  TENURE
+0  C10001    40.900749           0.818182      95.40              0.00                    95.4      0.000000             0.166667                    0.000000                          0.083333                0.000000                 0              2        1000.0   201.802084        139.509787          0.000000      12
+1  C10002  3202.467416           0.909091       0.00              0.00                     0.0   6442.945483             0.000000                    0.000000                          0.000000                0.250000                 4              0        7000.0  4103.032597       1072.340217          0.222222      12
+2  C10003  2495.148862           1.000000     773.17            773.17                     0.0      0.000000             1.000000                    1.000000                          0.000000                0.000000                 0             12        7500.0   622.066742        627.284787          0.000000      12
+3  C10004  1666.670542           0.636364    1499.00           1499.00                     0.0    205.788017             0.083333                    0.083333                          0.000000                0.083333                 1              1        7500.0     0.000000               NaN          0.000000      12
+4  C10005   817.714335           1.000000      16.00             16.00                     0.0      0.000000             0.083333                    0.083333                          0.000000                0.000000                 0              1        1200.0   678.334763        244.791237          0.000000      12
+>> 1. CEK MISSING VALUE (jumlah per kolom)
+CUST_ID                               0
+BALANCE                               0
+BALANCE_FREQUENCY                     0
+PURCHASES                             0
+ONEOFF_PURCHASES                      0
+INSTALLMENTS_PURCHASES                0
+CASH_ADVANCE                          0
+PURCHASES_FREQUENCY                   0
+ONEOFF_PURCHASES_FREQUENCY            0
+PURCHASES_INSTALLMENTS_FREQUENCY      0
+CASH_ADVANCE_FREQUENCY                0
+CASH_ADVANCE_TRX                      0
+PURCHASES_TRX                         0
+CREDIT_LIMIT                          1
+PAYMENTS                              0
+MINIMUM_PAYMENTS                    313
+PRC_FULL_PAYMENT                      0
+TENURE                                0
+Total sel kosong : 314
+
+>> 2. HANDLING MISSING VALUE
+   [numerik] 'CREDIT_LIMIT' diisi median = 3000.000
+   [numerik] 'MINIMUM_PAYMENTS' diisi median = 312.344
+   Missing value setelah handling : 0
+
+Kolom kontinu untuk analisis outlier: ['BALANCE', 'BALANCE_FREQUENCY', 'PURCHASES', 'ONEOFF_PURCHASES', 'INSTALLMENTS_PURCHASES', 'CASH_ADVANCE', 'PURCHASES_FREQUENCY', 'ONEOFF_PURCHASES_FREQUENCY', 'PURCHASES_INSTALLMENTS_FREQUENCY', 'CASH_ADVANCE_FREQUENCY', 'CASH_ADVANCE_TRX', 'PURCHASES_TRX', 'CREDIT_LIMIT', 'PAYMENTS', 'MINIMUM_PAYMENTS', 'PRC_FULL_PAYMENT']
+
+>> 3. DETEKSI OUTLIER
+   [Z-Score]  jumlah baris outlier (|z|>3) : 1164
+   [IQR]      jumlah baris outlier          : 5468
+   (Boxplot sebelum disimpan: boxplot_sebelum_CC_GENERAL.png)
+
+>> 4. HANDLING OUTLIER (Capping ke batas IQR)
+   Nilai di luar batas IQR diganti dengan batas bawah/atas.
+   (Boxplot sesudah disimpan: boxplot_sesudah_CC_GENERAL.png)
+
+Dataset bersih disimpan: output/clean_CC GENERAL.csv
+
+======================================================================
+DATASET: concrete_data.csv
+======================================================================
+Ukuran data (baris, kolom): (1030, 9)
+
+5 data teratas:
+   cement  blast_furnace_slag  fly_ash  water  superplasticizer  coarse_aggregate  fine_aggregate   age  concrete_compressive_strength
+0   540.0                 0.0      0.0  162.0               2.5            1040.0            676.0   28                          79.99
+1   540.0                 0.0      0.0  162.0               2.5            1055.0            676.0   28                          61.89
+2   332.5               142.5      0.0  228.0               0.0             932.0            594.0  270                          40.27
+3   332.5               142.5      0.0  228.0               0.0             932.0            594.0  365                          41.05
+4   198.6               132.4      0.0  192.0               0.0             978.4            825.5  360                          44.30
+>> 1. CEK MISSING VALUE (jumlah per kolom)
+cement                           0
+blast_furnace_slag               0
+fly_ash                          0
+water                            0
+superplasticizer                 0
+coarse_aggregate                 0
+fine_aggregate                   0
+age                              0
+concrete_compressive_strength    0
+Total sel kosong : 0
+
+>> 2. HANDLING MISSING VALUE
+   Missing value setelah handling : 0
+
+Kolom kontinu untuk analisis outlier: ['cement', 'blast_furnace_slag', 'fly_ash', 'water', 'superplasticizer', 'coarse_aggregate', 'fine_aggregate ', 'concrete_compressive_strength']
+
+>> 3. DETEKSI OUTLIER
+   [Z-Score]  jumlah baris outlier (|z|>3) : 16
+   [IQR]      jumlah baris outlier          : 30
+   (Boxplot sebelum disimpan: boxplot_sebelum_concrete_data.png)
+
+>> 4. HANDLING OUTLIER (Capping ke batas IQR)
+   Nilai di luar batas IQR diganti dengan batas bawah/atas.
+   (Boxplot sesudah disimpan: boxplot_sesudah_concrete_data.png)
+
+Dataset bersih disimpan: output/clean_concrete_data.csv
+
+======================================================================
+DATASET: heart.csv
+======================================================================
+Ukuran data (baris, kolom): (918, 12)
+
+5 data teratas:
+   Age Sex ChestPainType  RestingBP  Cholesterol  FastingBS RestingECG  MaxHR ExerciseAngina  Oldpeak ST_Slope  HeartDisease
+0   40   M           ATA        140          289          0     Normal    172              N      0.0       Up             0
+1   49   F           NAP        160          180          0     Normal    156              N      1.0     Flat             1
+2   37   M           ATA        130          283          0         ST     98              N      0.0       Up             0
+3   48   F           ASY        138          214          0     Normal    108              Y      1.5     Flat             1
+4   54   M           NAP        150          195          0     Normal    122              N      0.0       Up             0
+>> 1. CEK MISSING VALUE (jumlah per kolom)
+Age               0
+Sex               0
+ChestPainType     0
+RestingBP         0
+Cholesterol       0
+FastingBS         0
+RestingECG        0
+MaxHR             0
+ExerciseAngina    0
+Oldpeak           0
+ST_Slope          0
+HeartDisease      0
+Total sel kosong : 0
+
+>> 2. HANDLING MISSING VALUE
+   Missing value setelah handling : 0
+
+Kolom kontinu untuk analisis outlier: ['Age', 'RestingBP', 'Cholesterol', 'MaxHR', 'Oldpeak']
+
+>> 3. DETEKSI OUTLIER
+   [Z-Score]  jumlah baris outlier (|z|>3) : 19
+   [IQR]      jumlah baris outlier          : 216
+   (Boxplot sebelum disimpan: boxplot_sebelum_heart.png)
+
+>> 4. HANDLING OUTLIER (Capping ke batas IQR)
+   Nilai di luar batas IQR diganti dengan batas bawah/atas.
+   (Boxplot sesudah disimpan: boxplot_sesudah_heart.png)
+
+Dataset bersih disimpan: output/clean_heart.csv
+
+======================================================================
+SELESAI - Semua dataset telah di-preprocessing.
+======================================================================
