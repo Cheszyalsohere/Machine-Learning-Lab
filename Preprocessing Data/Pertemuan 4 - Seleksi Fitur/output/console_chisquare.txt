@@ -1,0 +1,19 @@
+==============================================================
+  SELEKSI FITUR - CHI-SQUARE (fitur kategorikal)
+==============================================================
+Dataset : heart.csv  (918 baris x 12 kolom)
+Target  : HeartDisease  |  alpha = 0.05
+
+Fitur             Chi-Square       P-Value   Keputusan
+--------------------------------------------------------------
+ST_Slope              355.92     5.168e-78   Dipilih (signifikan)
+ChestPainType         268.07     8.084e-58   Dipilih (signifikan)
+ExerciseAngina        222.26     2.908e-50   Dipilih (signifikan)
+Sex                    84.15     4.598e-20   Dipilih (signifikan)
+FastingBS              64.32     1.057e-15   Dipilih (signifikan)
+RestingECG             10.93     4.229e-03   Dipilih (signifikan)
+
+Fitur kategorikal terpilih (p < 0.05):
+  ST_Slope, ChestPainType, ExerciseAngina, Sex, FastingBS, RestingECG
+
+Hasil disimpan -> hasil_seleksi_chisquare.csv

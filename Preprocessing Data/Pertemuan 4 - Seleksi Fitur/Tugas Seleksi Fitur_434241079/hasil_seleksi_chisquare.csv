@@ -1,0 +1,7 @@
+Fitur,Chi_Square,P_Value,DOF,Keputusan
+ST_Slope,355.9184,5.167637689470128e-78,2,Dipilih (signifikan)
+ChestPainType,268.0672,8.08372842808765e-58,3,Dipilih (signifikan)
+ExerciseAngina,222.2594,2.907808387659878e-50,1,Dipilih (signifikan)
+Sex,84.1451,4.597617450809164e-20,1,Dipilih (signifikan)
+FastingBS,64.3207,1.0573018731809955e-15,1,Dipilih (signifikan)
+RestingECG,10.9315,0.0042292328167544925,2,Dipilih (signifikan)

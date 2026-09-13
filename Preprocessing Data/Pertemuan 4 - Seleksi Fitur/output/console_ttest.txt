@@ -1,0 +1,20 @@
+==============================================================
+  SELEKSI FITUR - INDEPENDENT t-TEST (fitur numerik)
+==============================================================
+Dataset : heart.csv  (918 baris x 12 kolom)
+Target  : HeartDisease  |  alpha = 0.05
+
+Jumlah data  ->  kelas 0 (sehat): 410  |  kelas 1 (sakit): 508
+
+Fitur             Mean_0    Mean_1    t-stat      P-Value   Keputusan
+------------------------------------------------------------------------------
+Oldpeak             0.41      1.27    -14.04    1.903e-40   Dipilih (signifikan)
+MaxHR             148.15    127.66     13.23    1.431e-36   Dipilih (signifikan)
+Age                50.55     55.90     -8.82    6.348e-18   Dipilih (signifikan)
+Cholesterol       227.12    175.94      7.63    6.481e-14   Dipilih (signifikan)
+RestingBP         130.18    134.19     -3.34    8.732e-04   Dipilih (signifikan)
+
+Fitur numerik terpilih (p < 0.05):
+  Oldpeak, MaxHR, Age, Cholesterol, RestingBP
+
+Hasil disimpan -> hasil_seleksi_ttest.csv
