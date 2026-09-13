@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# OS / Office temp files
+.DS_Store
+Thumbs.db
+~$*
+
+# Arsip lama / folder duplikat
+_arsip/
