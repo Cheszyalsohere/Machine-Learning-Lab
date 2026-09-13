@@ -1,0 +1,22 @@
+============================================================
+  EKSTRAKSI FITUR - PCA (n komponen BEBAS = 2)
+============================================================
+Dataset : heart.csv  (918 baris x 12 kolom)
+Jumlah fitur setelah encoding : 11
+
+Explained Variance Ratio:
+  PC1 : 25.14%
+  PC2 : 13.31%
+Total Variance Explained (2 komponen): 38.45%
+Informasi yang hilang: 61.55%
+
+5 baris pertama hasil PCA:
+      PC1       PC2  HeartDisease
+ 2.261181  0.169797             0
+ 1.137621  1.097544             1
+ 1.101846 -1.167057             0
+-0.980703  1.113893             1
+ 1.046800 -0.395467             0
+
+Hasil disimpan -> hasil_pca_bebas.csv
+Grafik         -> output/pca_bebas_scatter.png
