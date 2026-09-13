@@ -1,0 +1,6 @@
+Fitur,Mean_Kelas0,Mean_Kelas1,T_Statistic,P_Value,Keputusan
+Oldpeak,0.408,1.274,-14.04,1.9027223920937444e-40,Dipilih (signifikan)
+MaxHR,148.151,127.656,13.2315,1.4306374887872759e-36,Dipilih (signifikan)
+Age,50.551,55.9,-8.8225,6.348336655825803e-18,Dipilih (signifikan)
+Cholesterol,227.122,175.941,7.6269,6.481235871514507e-14,Dipilih (signifikan)
+RestingBP,130.18,134.185,-3.3395,0.000873226473435662,Dipilih (signifikan)
