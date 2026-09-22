@@ -1,0 +1,40 @@
+============================================================
+  IMBALANCED DATA - heart_preprocessed.csv
+============================================================
+Ukuran data : 918 baris x 12 kolom
+
+Distribusi AWAL (sebelum penyeimbangan):
+  Kelas 0 (Tidak Sakit): 410
+  Kelas 1 (Sakit      ): 508
+
+Distribusi SESUDAH SMOTE:
+  Kelas 0 (Tidak Sakit): 508
+  Kelas 1 (Sakit      ): 508
+  Total baris: 1016
+
+Distribusi SESUDAH SMOTE-ENN:
+  Kelas 0 (Tidak Sakit): 201
+  Kelas 1 (Sakit      ): 204
+  Total baris: 405
+
+Distribusi SESUDAH ROS:
+  Kelas 0 (Tidak Sakit): 508
+  Kelas 1 (Sakit      ): 508
+  Total baris: 1016
+
+Distribusi SESUDAH RUS:
+  Kelas 0 (Tidak Sakit): 410
+  Kelas 1 (Sakit      ): 410
+  Total baris: 820
+
+============================================================
+  RINGKASAN JUMLAH DATA TIAP METODE
+============================================================
+   Metode  Kelas 0  Kelas 1  Total
+     AWAL      410      508    918
+    SMOTE      508      508   1016
+SMOTE-ENN      201      204    405
+      ROS      508      508   1016
+      RUS      410      410    820
+
+Grafik distribusi tersimpan di folder output/
