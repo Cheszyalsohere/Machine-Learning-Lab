@@ -29,6 +29,8 @@ IDENTITAS = {
 SZ_PRE, SZ_TITLE, SZ_SUB = 18, 24, 13
 SZ_ID, SZ_H1, SZ_H2, SZ_BODY, SZ_CAP = 13, 16, 13, 12, 9
 INK = "#000000"          # heading & teks hitam (Times New Roman, akademik)
+# *teks miring* : satu bintang, tidak menempel huruf lain, tanpa spasi di tepi
+ITALIC = r"(?<![\*\w])\*(?!\s)(?:[^*]+?)(?<!\s)\*(?![\*\w])"
 
 
 # =================================================================
@@ -54,7 +56,9 @@ def _build_pdf(path, title, subtitle, blocks, ident, footer_slug):
     TERM = ParagraphStyle("TERM", fontName="Courier", fontSize=8, leading=10.5, textColor=colors.whitesmoke)
 
     def md(s):
-        s = html.escape(s); s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+        s = html.escape(s)
+        s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+        s = re.sub(ITALIC, lambda m: f"<i>{m.group(0)[1:-1]}</i>", s)
         return s.replace("\n", "<br/>")
 
     def table(hdr, rows):
@@ -96,11 +100,20 @@ def _build_pdf(path, title, subtitle, blocks, ident, footer_slug):
         Paragraph(subtitle, C(SZ_SUB)),
         Spacer(1, 2.2*cm),
         HRFlowable(width="55%", thickness=1, color=colors.HexColor("#555555"), hAlign="CENTER"),
-        Spacer(1, 0.5*cm),
-        Paragraph(f"NAMA : {ident['nama']}", C(SZ_ID, True)),
-        Paragraph(f"NIM : {ident['nim']}", C(SZ_ID, True)),
-        Paragraph(f"Kelas : {ident['kelas']}", C(SZ_ID, True)),
-        Spacer(1, 0.2*cm),
+        Spacer(1, 0.5*cm)]
+    if ident.get("members"):        # ---- cover KELOMPOK ----
+        story.append(Paragraph(f"Kelas : {ident['kelas']}"
+                               + (f"   |   Kelompok : {ident['kelompok']}" if ident.get('kelompok') else ""),
+                               C(SZ_ID, True)))
+        story += [Spacer(1, 0.25*cm), Paragraph("Anggota Kelompok:", C(SZ_ID, True))]
+        for i, m in enumerate(ident["members"], 1):
+            story.append(Paragraph(f"{i}. {m['nama']}"
+                                   + (f"  ({m['nim']})" if m.get('nim') else ""), C(SZ_SUB)))
+    else:                            # ---- cover INDIVIDU ----
+        story += [Paragraph(f"NAMA : {ident['nama']}", C(SZ_ID, True)),
+                  Paragraph(f"NIM : {ident['nim']}", C(SZ_ID, True)),
+                  Paragraph(f"Kelas : {ident['kelas']}", C(SZ_ID, True))]
+    story += [Spacer(1, 0.25*cm),
         Paragraph(ident["status"], C(SZ_SUB)),
         Spacer(1, 0.5*cm),
         HRFlowable(width="55%", thickness=1, color=colors.HexColor("#555555"), hAlign="CENTER"),
@@ -158,10 +171,12 @@ def _build_docx(path, title, subtitle, blocks, ident, footer_slug):
         if color is not None: run.font.color.rgb = color
 
     def add_runs(p, text):
-        for part in re.split(r"(\*\*.+?\*\*)", text):
+        for part in re.split(r"(\*\*.+?\*\*|" + ITALIC + ")", text):
             if not part: continue
             if part.startswith("**") and part.endswith("**"):
                 tnr(p.add_run(part[2:-2]), bold=True)
+            elif re.fullmatch(ITALIC, part):
+                r = p.add_run(part[1:-1]); tnr(r); r.italic = True
             else:
                 tnr(p.add_run(part))
 
@@ -204,9 +219,16 @@ def _build_docx(path, title, subtitle, blocks, ident, footer_slug):
     center(title, SZ_TITLE, True)
     center(subtitle, SZ_SUB)
     for _ in range(3): doc.add_paragraph()
-    center(f"NAMA : {ident['nama']}", SZ_ID, True)
-    center(f"NIM : {ident['nim']}", SZ_ID, True)
-    center(f"Kelas : {ident['kelas']}", SZ_ID, True)
+    if ident.get("members"):        # ---- cover KELOMPOK ----
+        center(f"Kelas : {ident['kelas']}"
+               + (f"   |   Kelompok : {ident['kelompok']}" if ident.get('kelompok') else ""), SZ_ID, True)
+        center("Anggota Kelompok:", SZ_ID, True)
+        for i, m in enumerate(ident["members"], 1):
+            center(f"{i}. {m['nama']}" + (f"  ({m['nim']})" if m.get('nim') else ""), SZ_SUB)
+    else:                            # ---- cover INDIVIDU ----
+        center(f"NAMA : {ident['nama']}", SZ_ID, True)
+        center(f"NIM : {ident['nim']}", SZ_ID, True)
+        center(f"Kelas : {ident['kelas']}", SZ_ID, True)
     center(ident["status"], SZ_SUB)
     doc.add_page_break()
 
