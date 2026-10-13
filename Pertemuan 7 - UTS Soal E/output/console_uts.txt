@@ -1,0 +1,91 @@
+
+================================================================
+  1. INPUT DATA
+================================================================
+File     : train.csv
+Ukuran   : 103904 baris x 25 kolom
+Kolom    : ['Gender', 'Customer Type', 'Age', 'Type of Travel', 'Class', 'Flight Distance', 'Inflight wifi service', 'Departure/Arrival time convenient', 'Ease of Online booking', 'Gate location', 'Food and drink', 'Online boarding', 'Seat comfort', 'Inflight entertainment', 'On-board service', 'Leg room service', 'Baggage handling', 'Checkin service', 'Inflight service', 'Cleanliness', 'Departure Delay in Minutes', 'Arrival Delay in Minutes', 'satisfaction']
+
+5 data teratas:
+   Gender      Customer Type  Age   Type of Travel     Class  Flight Distance  Inflight wifi service  Departure/Arrival time convenient  Ease of Online booking  Gate location  Food and drink  Online boarding  Seat comfort  Inflight entertainment  On-board service  Leg room service  Baggage handling  Checkin service  Inflight service  Cleanliness  Departure Delay in Minutes  Arrival Delay in Minutes             satisfaction
+0    Male     Loyal Customer   13  Personal Travel  Eco Plus              460                      3                                  4                       3              1               5                3             5                       5                 4                 3                 4                4                 5            5                          25                      18.0  neutral or dissatisfied
+1    Male  disloyal Customer   25  Business travel  Business              235                      3                                  2                       3              3               1                3             1                       1                 1                 5                 3                1                 4            1                           1                       6.0  neutral or dissatisfied
+2  Female     Loyal Customer   26  Business travel  Business             1142                      2                                  2                       2              2               5                5             5                       5                 4                 3                 4                4                 4            5                           0                       0.0                satisfied
+3  Female     Loyal Customer   25  Business travel  Business              562                      2                                  5                       5              5               2                2             2                       2                 2                 5                 3                1                 4            2                          11                       9.0  neutral or dissatisfied
+4    Male     Loyal Customer   61  Business travel  Business              214                      3                                  3                       3              3               4                5             5                       3                 3                 4                 4                3                 3            3                           0                       0.0                satisfied
+
+================================================================
+  2. PREPROCESSING
+================================================================
+>> Missing value:
+   Arrival Delay in Minutes: 310
+>> Duplikasi data: 0 baris
+   -> setelah handling: 103904 baris, missing = 0
+>> Outlier di-capping (IQR) pada 4 kolom numerik (18535 baris terdampak)
+>> Encoding kategorikal: ['Gender', 'Customer Type', 'Type of Travel', 'Class', 'satisfaction']
+>> Distribusi target (satisfaction): {0: 58879, 1: 45025}
+   0 = neutral or dissatisfied, 1 = satisfied
+
+================================================================
+  3. TRANSFORMASI (MIN-MAX NORMALIZATION)
+================================================================
+   Semua fitur diskalakan ke rentang [0, 1].
+     Gender  Customer Type  Age  Type of Travel  Class  Flight Distance  Inflight wifi service  Departure/Arrival time convenient  Ease of Online booking  Gate location  Food and drink  Online boarding  Seat comfort  Inflight entertainment  On-board service  Leg room service  Baggage handling  Checkin service  Inflight service  Cleanliness  Departure Delay in Minutes  Arrival Delay in Minutes
+min     0.0            0.0  0.0             0.0    0.0              0.0                    0.0                                0.0                     0.0            0.0             0.0              0.0           0.0                     0.0               0.0               0.0               0.0              0.0               0.0          0.0                         0.0                       0.0
+max     1.0            1.0  1.0             1.0    1.0              1.0                    1.0                                1.0                     1.0            1.0             1.0              1.0           1.0                     1.0               1.0               1.0               1.0              1.0               1.0          1.0                         1.0                       1.0
+
+================================================================
+  4. SPLIT DATA (80% training / 20% testing)
+================================================================
+   Training: 83123 baris | Testing: 20781 baris
+
+================================================================
+  5. SELEKSI FITUR (2 metode, ambil 10 fitur teratas)
+================================================================
+
+>> Chi-Square - 10 fitur terpilih:
+     Customer Type                    skor=2403.84
+     Type of Travel                   skor=11420.75
+     Class                            skor=5432.08
+     Flight Distance                  skor=1674.11
+     Inflight wifi service            skor=881.02
+     Online boarding                  skor=2364.79
+     Seat comfort                     skor=1016.69
+     Inflight entertainment           skor=1378.66
+     On-board service                 skor=842.86
+     Leg room service                 skor=851.83
+
+  Confusion Matrix (DT + Chi-Square):
+    [[10946, 830], [746, 8259]]
+  Akurasi : 92.42%
+  Presisi : 92.43%
+  Recall  : 92.42%
+  F1-Score: 92.42%
+
+>> ANOVA F - 10 fitur terpilih:
+     Type of Travel                   skor=20677.84
+     Class                            skor=20953.31
+     Flight Distance                  skor=8062.96
+     Inflight wifi service            skor=7443.34
+     Online boarding                  skor=28299.07
+     Seat comfort                     skor=11408.12
+     Inflight entertainment           skor=15453.96
+     On-board service                 skor=9559.85
+     Leg room service                 skor=9122.76
+     Cleanliness                      skor=8420.26
+
+  Confusion Matrix (DT + ANOVA F):
+    [[10872, 904], [760, 8245]]
+  Akurasi : 91.99%
+  Presisi : 92.02%
+  Recall  : 91.99%
+  F1-Score: 92.00%
+
+================================================================
+  6. RINGKASAN EVALUASI
+================================================================
+         Metode  Akurasi  Presisi  Recall    F1
+DT + Chi-Square    92.42    92.43   92.42 92.42
+   DT + ANOVA F    91.99    92.02   91.99 92.00
+
+Gambar confusion matrix & ringkasan tersimpan di folder output/

@@ -1,0 +1,3 @@
+Metode,Akurasi,Presisi,Recall,F1
+DT + Chi-Square,92.42,92.43,92.42,92.42
+DT + ANOVA F,91.99,92.02,91.99,92.0
