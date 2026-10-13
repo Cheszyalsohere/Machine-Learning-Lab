@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # =============================================================
 #  TEMPLATE LAPORAN (reusable) - gaya sesuai preferensi Irfan
-#  Font Times New Roman, heading hitam, cover: Nama/NIM/Kelas.
+#  Font Times New Roman, heading hitam, cover: logo UNAIR + Nama/NIM/Kelas,
+#  tanpa footer.
 #
 #  Cara pakai:
 #     from laporan_template import build_laporan
@@ -9,7 +10,7 @@
 #         pdf_path="...pdf", docx_path="...docx" or None,
 #         title="TRANSFORMASI DATA (NORMALISASI)",
 #         subtitle="Mata Kuliah Machine Learning – Pertemuan 3",
-#         footer_slug="434241079_Normalisasi",
+#         footer_slug="434241079_Normalisasi",   # dipakai sebagai judul metadata PDF
 #         blocks=[("h1","1. Pendahuluan"), ("p","..."),
 #                 ("table",(hdr, rows)), ("img",(path,16.0)), ("cap","..."),
 #                 ("code","..."), ("term","..."), ("pb",None)])
@@ -29,6 +30,8 @@ IDENTITAS = {
 SZ_PRE, SZ_TITLE, SZ_SUB = 18, 24, 13
 SZ_ID, SZ_H1, SZ_H2, SZ_BODY, SZ_CAP = 13, 16, 13, 12, 9
 INK = "#000000"          # heading & teks hitam (Times New Roman, akademik)
+LOGO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo_unair.png")
+LOGO_CM = 4.5            # lebar logo di cover
 # *teks miring* : satu bintang, tidak menempel huruf lain, tanpa spasi di tepi
 ITALIC = r"(?<![\*\w])\*(?!\s)(?:[^*]+?)(?<!\s)\*(?![\*\w])"
 
@@ -93,13 +96,17 @@ def _build_pdf(path, title, subtitle, blocks, ident, footer_slug):
     # ---- COVER ----
     C = lambda sz, b=False: ParagraphStyle("c", fontName="Times-Bold" if b else "Times-Roman",
                                            fontSize=sz, alignment=TA_CENTER, leading=sz*1.3)
-    story += [Spacer(1, 3.2*cm),
+    story += [Spacer(1, 3.0*cm),
         Paragraph("LAPORAN TUGAS", C(SZ_PRE, True)),
         Paragraph(title, C(SZ_TITLE, True)),
         Spacer(1, 0.3*cm),
-        Paragraph(subtitle, C(SZ_SUB)),
-        Spacer(1, 2.2*cm),
-        HRFlowable(width="55%", thickness=1, color=colors.HexColor("#555555"), hAlign="CENTER"),
+        Paragraph(subtitle, C(SZ_SUB))]
+    if os.path.exists(LOGO):
+        story += [Spacer(1, 1.4*cm), Image(LOGO, width=LOGO_CM*cm, height=LOGO_CM*cm),
+                  Spacer(1, 1.4*cm)]
+    else:
+        story.append(Spacer(1, 2.2*cm))
+    story += [HRFlowable(width="55%", thickness=1, color=colors.HexColor("#555555"), hAlign="CENTER"),
         Spacer(1, 0.5*cm)]
     if ident.get("members"):        # ---- cover KELOMPOK ----
         story.append(Paragraph(f"Kelas : {ident['kelas']}"
@@ -130,14 +137,10 @@ def _build_pdf(path, title, subtitle, blocks, ident, footer_slug):
         elif kind == "img": story.append(image(val))
         elif kind == "pb": story.append(PageBreak())
 
-    def foot(c, doc):
-        c.saveState(); c.setFont("Times-Roman", 8); c.setFillColor(colors.grey)
-        c.drawString(2*cm, 1.1*cm, footer_slug)
-        c.drawRightString(19*cm, 1.1*cm, f"Halaman {doc.page}"); c.restoreState()
-
+    # tanpa footer (sesuai preferensi); footer_slug hanya jadi judul metadata PDF
     doc = SimpleDocTemplate(path, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm,
                             topMargin=1.8*cm, bottomMargin=1.6*cm, title=footer_slug, author=ident["nim"])
-    doc.build(story, onFirstPage=foot, onLaterPages=foot)
+    doc.build(story)
     print("PDF :", path)
 
 
@@ -214,11 +217,15 @@ def _build_docx(path, title, subtitle, blocks, ident, footer_slug):
         doc.add_paragraph().paragraph_format.space_after = Pt(2)
 
     # ---- COVER ----
-    for _ in range(6): doc.add_paragraph()
+    for _ in range(3): doc.add_paragraph()
     center("LAPORAN TUGAS", SZ_PRE, True)
     center(title, SZ_TITLE, True)
     center(subtitle, SZ_SUB)
-    for _ in range(3): doc.add_paragraph()
+    doc.add_paragraph()
+    if os.path.exists(LOGO):
+        par = doc.add_paragraph(); par.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        par.add_run().add_picture(LOGO, width=Inches(LOGO_CM / 2.54))
+    doc.add_paragraph()
     if ident.get("members"):        # ---- cover KELOMPOK ----
         center(f"Kelas : {ident['kelas']}"
                + (f"   |   Kelompok : {ident['kelompok']}" if ident.get('kelompok') else ""), SZ_ID, True)
@@ -250,8 +257,7 @@ def _build_docx(path, title, subtitle, blocks, ident, footer_slug):
             par.add_run().add_picture(p, width=Inches(min(w/2.54, natural_in)))
         elif kind == "pb": doc.add_page_break()
 
-    ft = doc.sections[0].footer.paragraphs[0]; ft.text = ""
-    tnr(ft.add_run(footer_slug), size=8, color=RGBColor(0x88,0x88,0x88))
+    doc.core_properties.title = footer_slug          # tanpa footer
     doc.save(path); print("DOCX:", path)
 
 
