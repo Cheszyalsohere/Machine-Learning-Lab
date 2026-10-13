@@ -1,0 +1,105 @@
+
+================================================================
+  1. INPUT DATA
+================================================================
+Ukuran data : 103904 baris x 23 kolom
+Gender     Customer Type  Age  Type of Travel    Class  Flight Distance
+  Male    Loyal Customer   13 Personal Travel Eco Plus              460
+  Male disloyal Customer   25 Business travel Business              235
+Female    Loyal Customer   26 Business travel Business             1142
+Female    Loyal Customer   25 Business travel Business              562
+  Male    Loyal Customer   61 Business travel Business              214
+... (+17 kolom lainnya)
+
+================================================================
+  2. PREPROCESSING
+================================================================
+>> Missing value : 310 sel (Arrival Delay in Minutes=310)
+>> Duplikasi     : 0 baris
+>> Outlier       : di-capping IQR pada 4 kolom numerik
+>> Encoding      : ['Gender', 'Customer Type', 'Type of Travel', 'Class']
+>> Target        : 0 = neutral or dissatisfied (58879), 1 = satisfied (45025)
+
+================================================================
+  3. TRANSFORMASI MIN-MAX
+================================================================
+   22 fitur diskalakan ke rentang [0, 1]
+
+================================================================
+  4. SPLIT DATA 80% TRAINING / 20% TESTING
+================================================================
+   Training : 83123 baris
+   Testing  : 20781 baris
+
+================================================================
+  5. SELEKSI FITUR: Chi-Square (10 fitur teratas)
+================================================================
+   - Customer Type
+   - Type of Travel
+   - Class
+   - Flight Distance
+   - Inflight wifi service
+   - Online boarding
+   - Seat comfort
+   - Inflight entertainment
+   - On-board service
+   - Leg room service
+
+================================================================
+  6. KLASIFIKASI & EVALUASI (fitur Chi-Square)
+================================================================
+>> Naive Bayes + Chi-Square  (waktu latih 0.0 detik)
+     Confusion Matrix : [[TN=10534, FP=1242], [FN=1581, TP=7424]]
+     Akurasi 86.42% | Presisi 86.39% | Recall 86.42% | F1 86.38%
+>> SVM sedang dilatih (bisa 2-3 menit)...
+>> SVM + Chi-Square  (waktu latih 114.7 detik)
+     Confusion Matrix : [[TN=11180, FP=596], [FN=706, TP=8299]]
+     Akurasi 93.73% | Presisi 93.73% | Recall 93.73% | F1 93.73%
+>> Decision Tree + Chi-Square  (waktu latih 0.5 detik)
+     Confusion Matrix : [[TN=10946, FP=830], [FN=746, TP=8259]]
+     Akurasi 92.42% | Presisi 92.43% | Recall 92.42% | F1 92.42%
+
+================================================================
+  5. SELEKSI FITUR: ANOVA F (10 fitur teratas)
+================================================================
+   - Type of Travel
+   - Class
+   - Flight Distance
+   - Inflight wifi service
+   - Online boarding
+   - Seat comfort
+   - Inflight entertainment
+   - On-board service
+   - Leg room service
+   - Cleanliness
+
+================================================================
+  6. KLASIFIKASI & EVALUASI (fitur ANOVA F)
+================================================================
+>> Naive Bayes + ANOVA F  (waktu latih 0.0 detik)
+     Confusion Matrix : [[TN=10208, FP=1568], [FN=1484, TP=7521]]
+     Akurasi 85.31% | Presisi 85.33% | Recall 85.31% | F1 85.32%
+>> SVM sedang dilatih (bisa 2-3 menit)...
+>> SVM + ANOVA F  (waktu latih 138.1 detik)
+     Confusion Matrix : [[TN=11034, FP=742], [FN=678, TP=8327]]
+     Akurasi 93.17% | Presisi 93.17% | Recall 93.17% | F1 93.17%
+>> Decision Tree + ANOVA F  (waktu latih 0.5 detik)
+     Confusion Matrix : [[TN=10872, FP=904], [FN=760, TP=8245]]
+     Akurasi 91.99% | Presisi 92.02% | Recall 91.99% | F1 92.00%
+
+================================================================
+  7. PERBANDINGAN KINERJA (urut akurasi)
+================================================================
+                     Model  Akurasi  Presisi  Recall    F1
+          SVM + Chi-Square    93.73    93.73   93.73 93.73
+             SVM + ANOVA F    93.17    93.17   93.17 93.17
+Decision Tree + Chi-Square    92.42    92.43   92.42 92.42
+   Decision Tree + ANOVA F    91.99    92.02   91.99 92.00
+  Naive Bayes + Chi-Square    86.42    86.39   86.42 86.38
+     Naive Bayes + ANOVA F    85.31    85.33   85.31 85.32
+
+================================================================
+  8. MODEL TERBAIK
+================================================================
+   SVM + Chi-Square  ->  akurasi 93.73%
+   Disimpan ke model_terbaik.joblib (dipakai oleh UI Streamlit)
