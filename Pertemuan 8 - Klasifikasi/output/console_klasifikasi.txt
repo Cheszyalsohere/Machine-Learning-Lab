@@ -52,10 +52,10 @@ Female    Loyal Customer   25 Business travel Business              562
      Confusion Matrix : [[TN=10534, FP=1242], [FN=1581, TP=7424]]
      Akurasi 86.42% | Presisi 86.39% | Recall 86.42% | F1 86.38%
 >> SVM sedang dilatih (bisa 2-3 menit)...
->> SVM + Chi-Square  (waktu latih 114.7 detik)
+>> SVM + Chi-Square  (waktu latih 74.0 detik)
      Confusion Matrix : [[TN=11180, FP=596], [FN=706, TP=8299]]
      Akurasi 93.73% | Presisi 93.73% | Recall 93.73% | F1 93.73%
->> Decision Tree + Chi-Square  (waktu latih 0.5 detik)
+>> Decision Tree + Chi-Square  (waktu latih 0.3 detik)
      Confusion Matrix : [[TN=10946, FP=830], [FN=746, TP=8259]]
      Akurasi 92.42% | Presisi 92.43% | Recall 92.42% | F1 92.42%
 
@@ -80,10 +80,10 @@ Female    Loyal Customer   25 Business travel Business              562
      Confusion Matrix : [[TN=10208, FP=1568], [FN=1484, TP=7521]]
      Akurasi 85.31% | Presisi 85.33% | Recall 85.31% | F1 85.32%
 >> SVM sedang dilatih (bisa 2-3 menit)...
->> SVM + ANOVA F  (waktu latih 138.1 detik)
+>> SVM + ANOVA F  (waktu latih 72.8 detik)
      Confusion Matrix : [[TN=11034, FP=742], [FN=678, TP=8327]]
      Akurasi 93.17% | Presisi 93.17% | Recall 93.17% | F1 93.17%
->> Decision Tree + ANOVA F  (waktu latih 0.5 detik)
+>> Decision Tree + ANOVA F  (waktu latih 0.3 detik)
      Confusion Matrix : [[TN=10872, FP=904], [FN=760, TP=8245]]
      Akurasi 91.99% | Presisi 92.02% | Recall 91.99% | F1 92.00%
 
@@ -103,3 +103,35 @@ Decision Tree + Chi-Square    92.42    92.43   92.42 92.42
 ================================================================
    SVM + Chi-Square  ->  akurasi 93.73%
    Disimpan ke model_terbaik.joblib (dipakai oleh UI Streamlit)
+
+================================================================
+  9. LANJUTAN: TANPA TRANSFORMASI & SELEKSI FITUR (ORI)
+================================================================
+   Semua 22 fitur dipakai, nilai asli (tidak dinormalisasi)
+   Training : 83123 baris | Testing : 20781 baris
+>> Naive Bayes (Ori)  (waktu latih 0.0 detik)
+     Confusion Matrix : [[TN=10630, FP=1146], [FN=1557, TP=7448]]
+     Akurasi 86.99% | Presisi 86.98% | Recall 86.99% | F1 86.95%
+>> SVM sedang dilatih tanpa normalisasi (bisa lebih lama)...
+>> SVM (Ori)  (waktu latih 561.1 detik)
+     Confusion Matrix : [[TN=9834, FP=1942], [FN=4855, TP=4150]]
+     Akurasi 67.29% | Presisi 67.46% | Recall 67.29% | F1 65.94%
+>> Decision Tree (Ori)  (waktu latih 0.7 detik)
+     Confusion Matrix : [[TN=11157, FP=619], [FN=492, TP=8513]]
+     Akurasi 94.65% | Presisi 94.67% | Recall 94.65% | F1 94.66%
+
+================================================================
+  10. PERBANDINGAN SEMUA METODE (urut akurasi)
+================================================================
+                     Model  Akurasi  Presisi  Recall    F1  Waktu (detik)
+       Decision Tree (Ori)    94.65    94.67   94.65 94.66            0.7
+          SVM + Chi-Square    93.73    93.73   93.73 93.73           74.0
+             SVM + ANOVA F    93.17    93.17   93.17 93.17           72.8
+Decision Tree + Chi-Square    92.42    92.43   92.42 92.42            0.3
+   Decision Tree + ANOVA F    91.99    92.02   91.99 92.00            0.3
+         Naive Bayes (Ori)    86.99    86.98   86.99 86.95            0.0
+  Naive Bayes + Chi-Square    86.42    86.39   86.42 86.38            0.0
+     Naive Bayes + ANOVA F    85.31    85.33   85.31 85.32            0.0
+                 SVM (Ori)    67.29    67.46   67.29 65.94          561.1
+
+   Akurasi tertinggi keseluruhan: Decision Tree (Ori) (94.65%)
