@@ -32,6 +32,11 @@ SZ_ID, SZ_H1, SZ_H2, SZ_BODY, SZ_CAP = 13, 16, 13, 12, 9
 INK = "#000000"          # heading & teks hitam (Times New Roman, akademik)
 LOGO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo_unair.png")
 LOGO_CM = 4.5            # lebar logo di cover
+def paragraf(teks):
+    """Pecah teks blok 'p' per baris -> daftar paragraf (baris kosong dibuang)."""
+    return [b.strip() for b in teks.split("\n") if b.strip()]
+
+
 # *teks miring* : satu bintang, tidak menempel huruf lain, tanpa spasi di tepi
 ITALIC = r"(?<![\*\w])\*(?!\s)(?:[^*]+?)(?<!\s)\*(?![\*\w])"
 
@@ -129,7 +134,9 @@ def _build_pdf(path, title, subtitle, blocks, ident, footer_slug):
     for kind, val in blocks:
         if kind == "h1": story.append(Paragraph(md(val), H1))
         elif kind == "h2": story.append(Paragraph(md(val), H2))
-        elif kind == "p": story += [Paragraph(md(val), BODY), Spacer(1, 0.12*cm)]
+        elif kind == "p":          # tiap baris = paragraf sendiri
+            for baris in paragraf(val):
+                story += [Paragraph(md(baris), BODY), Spacer(1, 0.12*cm)]
         elif kind == "cap": story.append(Paragraph(md(val), CAP))
         elif kind == "table": story += [table(*val), Spacer(1, 0.05*cm)]
         elif kind == "code": story += [boxpara(val, CODE, colors.HexColor("#f2f6ec"), colors.HexColor("#b8c9a8")), Spacer(1,0.15*cm)]
@@ -242,9 +249,10 @@ def _build_docx(path, title, subtitle, blocks, ident, footer_slug):
     for kind, val in blocks:
         if kind == "h1": heading(val, SZ_H1)
         elif kind == "h2": heading(val, SZ_H2)
-        elif kind == "p":
-            p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            p.paragraph_format.space_after = Pt(8); add_runs(p, val)
+        elif kind == "p":          # tiap baris = paragraf sendiri (bukan line break)
+            for baris in paragraf(val):
+                p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                p.paragraph_format.space_after = Pt(8); add_runs(p, baris)
         elif kind == "cap":
             p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             tnr(p.add_run(val), size=SZ_CAP, color=RGBColor(0x80,0x80,0x80)); p.runs[0].italic = True
