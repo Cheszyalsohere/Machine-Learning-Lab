@@ -233,6 +233,7 @@ def main():
         hasil = evaluasi(nama, yo_test, model.predict(Xo_test), label)
         hasil["Waktu (detik)"] = round(durasi, 1)
         semua_hasil.append(hasil)
+        model_terlatih[nama] = (model, None, list(X.columns))
 
     # ---------------- 10. PERBANDINGAN SEMUA METODE ----------------
     garis("10. PERBANDINGAN SEMUA METODE (urut akurasi)")
@@ -262,6 +263,22 @@ def main():
 
     juara = tabel_semua.iloc[0]
     print(f"\n   Akurasi tertinggi keseluruhan: {juara['Model']} ({juara['Akurasi'] * 100:.2f}%)")
+
+    # ---------------- 11. SIMPAN MODEL TERBAIK SKENARIO ORI (UI VERSI 2) ----------------
+    terbaik_ori = tabel_semua[tabel_semua["Model"].str.contains(r"\(Ori\)")].iloc[0]
+    model_ori, _, fitur_ori = model_terlatih[terbaik_ori["Model"]]
+    bundle_ori = {
+        **bundle,
+        "nama_model": terbaik_ori["Model"],
+        "akurasi": float(terbaik_ori["Akurasi"]),
+        "model": model_ori,
+        "scaler": None,                     # Ori: tanpa Min-Max
+        "selector": None,                   # Ori: tanpa seleksi fitur
+        "fitur_terpilih": fitur_ori,        # semua 22 fitur
+        "perbandingan": tampil_semua.to_dict("records"),
+    }
+    joblib.dump(bundle_ori, os.path.join(BASE_DIR, "model_terbaik_ori.joblib"))
+    print(f"   {terbaik_ori['Model']} disimpan ke model_terbaik_ori.joblib (UI versi 2)")
 
 
 if __name__ == "__main__":

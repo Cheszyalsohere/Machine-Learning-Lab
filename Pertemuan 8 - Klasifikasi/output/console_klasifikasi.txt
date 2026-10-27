@@ -52,7 +52,7 @@ Female    Loyal Customer   25 Business travel Business              562
      Confusion Matrix : [[TN=10534, FP=1242], [FN=1581, TP=7424]]
      Akurasi 86.42% | Presisi 86.39% | Recall 86.42% | F1 86.38%
 >> SVM sedang dilatih (bisa 2-3 menit)...
->> SVM + Chi-Square  (waktu latih 74.0 detik)
+>> SVM + Chi-Square  (waktu latih 73.3 detik)
      Confusion Matrix : [[TN=11180, FP=596], [FN=706, TP=8299]]
      Akurasi 93.73% | Presisi 93.73% | Recall 93.73% | F1 93.73%
 >> Decision Tree + Chi-Square  (waktu latih 0.3 detik)
@@ -80,7 +80,7 @@ Female    Loyal Customer   25 Business travel Business              562
      Confusion Matrix : [[TN=10208, FP=1568], [FN=1484, TP=7521]]
      Akurasi 85.31% | Presisi 85.33% | Recall 85.31% | F1 85.32%
 >> SVM sedang dilatih (bisa 2-3 menit)...
->> SVM + ANOVA F  (waktu latih 72.8 detik)
+>> SVM + ANOVA F  (waktu latih 75.0 detik)
      Confusion Matrix : [[TN=11034, FP=742], [FN=678, TP=8327]]
      Akurasi 93.17% | Presisi 93.17% | Recall 93.17% | F1 93.17%
 >> Decision Tree + ANOVA F  (waktu latih 0.3 detik)
@@ -113,7 +113,7 @@ Decision Tree + Chi-Square    92.42    92.43   92.42 92.42
      Confusion Matrix : [[TN=10630, FP=1146], [FN=1557, TP=7448]]
      Akurasi 86.99% | Presisi 86.98% | Recall 86.99% | F1 86.95%
 >> SVM sedang dilatih tanpa normalisasi (bisa lebih lama)...
->> SVM (Ori)  (waktu latih 561.1 detik)
+>> SVM (Ori)  (waktu latih 536.6 detik)
      Confusion Matrix : [[TN=9834, FP=1942], [FN=4855, TP=4150]]
      Akurasi 67.29% | Presisi 67.46% | Recall 67.29% | F1 65.94%
 >> Decision Tree (Ori)  (waktu latih 0.7 detik)
@@ -125,13 +125,14 @@ Decision Tree + Chi-Square    92.42    92.43   92.42 92.42
 ================================================================
                      Model  Akurasi  Presisi  Recall    F1  Waktu (detik)
        Decision Tree (Ori)    94.65    94.67   94.65 94.66            0.7
-          SVM + Chi-Square    93.73    93.73   93.73 93.73           74.0
-             SVM + ANOVA F    93.17    93.17   93.17 93.17           72.8
+          SVM + Chi-Square    93.73    93.73   93.73 93.73           73.3
+             SVM + ANOVA F    93.17    93.17   93.17 93.17           75.0
 Decision Tree + Chi-Square    92.42    92.43   92.42 92.42            0.3
    Decision Tree + ANOVA F    91.99    92.02   91.99 92.00            0.3
          Naive Bayes (Ori)    86.99    86.98   86.99 86.95            0.0
   Naive Bayes + Chi-Square    86.42    86.39   86.42 86.38            0.0
      Naive Bayes + ANOVA F    85.31    85.33   85.31 85.32            0.0
-                 SVM (Ori)    67.29    67.46   67.29 65.94          561.1
+                 SVM (Ori)    67.29    67.46   67.29 65.94          536.6
 
    Akurasi tertinggi keseluruhan: Decision Tree (Ori) (94.65%)
+   Decision Tree (Ori) disimpan ke model_terbaik_ori.joblib (UI versi 2)
