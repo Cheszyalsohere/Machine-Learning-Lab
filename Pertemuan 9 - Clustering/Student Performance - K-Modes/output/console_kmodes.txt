@@ -1,0 +1,96 @@
+
+================================================================
+  1. INPUT DATA
+================================================================
+Ukuran data : 6607 baris x 20 kolom
+Kategorikal : 13 kolom | Numerik : 6 kolom + Exam_Score
+ Hours_Studied  Attendance Parental_Involvement Access_to_Resources Extracurricular_Activities
+            23          84                  Low                High                         No
+            19          64                  Low              Medium                         No
+            24          98               Medium              Medium                        Yes
+            29          89                  Low              Medium                        Yes
+            19          92               Medium              Medium                        Yes
+... (+15 kolom lainnya)
+
+================================================================
+  2. PREPROCESSING
+================================================================
+>> Missing value:
+     Teacher_Quality           : 78
+     Parental_Education_Level  : 90
+     Distance_from_Home        : 67
+   -> diisi modus, sisa missing = 0
+>> Duplikasi data: 0 baris
+>> Outlier (IQR) kolom numerik:
+     Hours_Studied             : 43
+     Attendance                : 0
+     Sleep_Hours               : 0
+     Previous_Scores           : 0
+     Tutoring_Sessions         : 430
+     Physical_Activity         : 0
+     Exam_Score                : 104
+   -> Exam_Score > 100 sebanyak 1 baris di-cap menjadi 100
+   -> outlier kolom lain tidak dibuang; setelah diskretisasi otomatis
+      masuk kategori Rendah/Tinggi sehingga tidak merusak K-Modes
+
+================================================================
+  3. DISKRETISASI NUMERIK -> KATEGORI (syarat K-Modes)
+================================================================
+   Hours_Studied       : Rendah<=17, Sedang<=23, Tinggi<=44
+   Attendance          : Rendah<=73, Sedang<=87, Tinggi<=100
+   Sleep_Hours         : Rendah<=6, Sedang<=8, Tinggi<=10
+   Previous_Scores     : Rendah<=67, Sedang<=83, Tinggi<=100
+   Tutoring_Sessions   : Rendah<=1, Sedang<=2, Tinggi<=8
+   Physical_Activity   : Rendah<=3, Tinggi<=6
+   Fitur untuk clustering: 19 kolom kategorikal (Exam_Score tidak ikut)
+
+================================================================
+  4. ELBOW METHOD (k = 1 sampai 10)
+================================================================
+   k = 1   cost =      55914
+   k = 2   cost =      51538
+   k = 3   cost =      49171
+   k = 4   cost =      48409
+   k = 5   cost =      46848
+   k = 6   cost =      46038
+   k = 7   cost =      45213
+   k = 8   cost =      44578
+   k = 9   cost =      44476
+   k = 10  cost =      43631
+   Titik siku (elbow) : k = 3
+
+================================================================
+  5. K-MODES (k = 3)
+================================================================
+   Iterasi selesai dalam 10.5 detik, cost = 49171
+   Cluster 0: 2768 siswa (41.9%)
+   Cluster 1: 2143 siswa (32.4%)
+   Cluster 2: 1696 siswa (25.7%)
+
+================================================================
+  6. EVALUASI - SILHOUETTE SCORE (jarak Hamming)
+================================================================
+   Silhouette Score: 0.0431
+
+================================================================
+  7. PROFIL CLUSTER (modus tiap fitur + rata-rata Exam_Score)
+================================================================
+   Fitur yang membedakan antar-cluster:
+                              Cluster 0    Cluster 1 Cluster 2
+Extracurricular_Activities           No          Yes       Yes
+Motivation_Level                 Medium          Low    Medium
+Family_Income                    Medium          Low       Low
+Peer_Influence                  Neutral     Positive   Neutral
+Parental_Education_Level    High School  High School   College
+Gender                           Female         Male      Male
+Hours_Studied                    Rendah       Tinggi    Sedang
+Attendance                       Sedang       Rendah    Tinggi
+Previous_Scores                  Tinggi       Tinggi    Sedang
+
+   Rata-rata Exam_Score per cluster:
+     Cluster 0: 66.81
+     Cluster 1: 67.04
+     Cluster 2: 68.17
+
+Hasil disimpan -> output/hasil_clustering_kmodes.csv, centroid_kmodes.csv
+EXIT=0

@@ -1,0 +1,20 @@
+,Cluster 0,Cluster 1,Cluster 2
+Parental_Involvement,Medium,Medium,Medium
+Access_to_Resources,Medium,Medium,Medium
+Extracurricular_Activities,No,Yes,Yes
+Motivation_Level,Medium,Low,Medium
+Internet_Access,Yes,Yes,Yes
+Family_Income,Medium,Low,Low
+Teacher_Quality,Medium,Medium,Medium
+School_Type,Public,Public,Public
+Peer_Influence,Neutral,Positive,Neutral
+Learning_Disabilities,No,No,No
+Parental_Education_Level,High School,High School,College
+Distance_from_Home,Near,Near,Near
+Gender,Female,Male,Male
+Hours_Studied,Rendah,Tinggi,Sedang
+Attendance,Sedang,Rendah,Tinggi
+Sleep_Hours,Sedang,Sedang,Sedang
+Previous_Scores,Tinggi,Tinggi,Sedang
+Tutoring_Sessions,Rendah,Rendah,Rendah
+Physical_Activity,Rendah,Rendah,Rendah
