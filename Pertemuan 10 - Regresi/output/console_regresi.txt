@@ -1,0 +1,74 @@
+
+================================================================
+  1. INPUT DATA
+================================================================
+Ukuran data : 103904 baris x 23 kolom
+Target      : Arrival Delay in Minutes
+Gender    Class  Flight Distance  Departure Delay in Minutes  Arrival Delay in Minutes
+  Male Eco Plus              460                          25                      18.0
+  Male Business              235                           1                       6.0
+Female Business             1142                           0                       0.0
+Female Business              562                          11                       9.0
+  Male Business              214                           0                       0.0
+
+================================================================
+  2. PREPROCESSING
+================================================================
+>> Missing value:
+     Arrival Delay in Minutes: 310
+   -> baris dengan target kosong dihapus, sisa 103594 baris
+>> Duplikasi data: 0 baris
+>> Outlier (IQR):
+     Flight Distance             :   2287 baris (maks 4983)
+     Departure Delay in Minutes  :  14428 baris (maks 1592)
+     Arrival Delay in Minutes    :  13954 baris (maks 1584)
+   -> tidak dibuang: keterlambatan panjang adalah kejadian nyata,
+      bukan salah input, dan tetap mengikuti pola linear delay
+>> One-hot encoding: ['Gender', 'Customer Type', 'Type of Travel', 'Class', 'satisfaction']
+   -> total 23 fitur
+
+================================================================
+  3. KORELASI FITUR DENGAN TARGET (5 teratas)
+================================================================
+   Departure Delay in Minutes        : +0.965
+   Inflight service                  : -0.059
+   satisfaction_satisfied            : -0.058
+   On-board service                  : -0.035
+   Food and drink                    : -0.033
+
+================================================================
+  4. SPLIT DATA 80% TRAINING / 20% TESTING
+================================================================
+   Training : 82875 baris
+   Testing  : 20719 baris
+
+================================================================
+  5. MODEL LINEAR REGRESSION
+================================================================
+   Intercept : 2.1053
+   Koefisien 5 fitur paling berpengaruh:
+     Departure Delay in Minutes        : +0.9813
+     satisfaction_satisfied            : -0.9455
+     Type of Travel_Personal Travel    : -0.7367
+     Customer Type_disloyal Customer   : -0.5092
+     Class_Eco Plus                    : +0.2539
+
+================================================================
+  6. EVALUASI MODEL
+================================================================
+   MAE  : 5.2740 menit
+   MSE  : 98.4713
+   RMSE : 9.9233 menit
+   R2   : 0.9344  (data training: 0.9318)
+
+================================================================
+  7. CONTOH PREDIKSI (5 data testing)
+================================================================
+ Departure Delay  Arrival Delay asli  Prediksi  Selisih
+               0                 0.0       0.9     -0.9
+               0                 0.0       0.8     -0.8
+               0                 0.0       1.0     -1.0
+              94                79.0      93.6    -14.6
+               0                 0.0       0.6     -0.6
+
+Hasil disimpan -> output/hasil_prediksi.csv, output/evaluasi.csv
