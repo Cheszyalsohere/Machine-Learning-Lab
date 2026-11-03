@@ -3,14 +3,17 @@
 #  File    : regresi_kelompok5.py
 #  Kelompok: 5 (TI-C5) - Muhammad Irfan Nuha (434241079)
 #                        Bunga Lala Sal Sabila (434241066)
-#  Dataset : Airline Passenger Satisfaction (dataset UTS kelompok)
-#  Target  : Arrival Delay in Minutes (keterlambatan tiba, menit)
-#  Metode  : Linear Regression
+#  Dataset : Concrete Compressive Strength (1.030 sampel beton)
+#  Target  : concrete_compressive_strength (kuat tekan beton, MPa)
+#  Metode  : Gradient Boosting Regressor
+#            (Linear Regression dipakai sebagai pembanding)
 #
 #  Alur:
-#    Input -> Preprocessing (missing, duplikat, outlier, encoding)
-#    -> Split 80/20 -> Linear Regression -> Evaluasi (MAE, MSE,
-#    RMSE, R2) -> Interpretasi koefisien -> Contoh prediksi
+#    Input -> Preprocessing (missing, duplikat, outlier)
+#    -> Eksplorasi korelasi -> Split 80/20
+#    -> Linear Regression (pembanding) & Gradient Boosting
+#    -> Evaluasi (MAE, MSE, RMSE, R2) -> Feature importance
+#    -> Contoh prediksi
 # =============================================================
 
 import os
@@ -19,14 +22,16 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(BASE_DIR, "output")
 os.makedirs(OUT_DIR, exist_ok=True)
-TARGET = "Arrival Delay in Minutes"
+TARGET = "concrete_compressive_strength"
 
 
 def judul(teks):
@@ -41,57 +46,59 @@ def tampilkan(nama_file):
     plt.close()
 
 
+def evaluasi(y_asli, y_pred):
+    """Hitung MAE, MSE, RMSE, dan R2."""
+    mse = mean_squared_error(y_asli, y_pred)
+    return {"MAE": mean_absolute_error(y_asli, y_pred), "MSE": mse,
+            "RMSE": np.sqrt(mse), "R2": r2_score(y_asli, y_pred)}
+
+
 def main():
     # ---------------- 1. INPUT ----------------
     judul("1. INPUT DATA")
-    df = pd.read_csv(os.path.join(BASE_DIR, "train.csv"))
-    df = df.drop(columns=[c for c in ["Unnamed: 0", "id"] if c in df.columns])
+    df = pd.read_csv(os.path.join(BASE_DIR, "concrete_data.csv"))
+    df.columns = df.columns.str.strip()          # ada spasi di nama kolom 'fine_aggregate '
     print(f"Ukuran data : {df.shape[0]} baris x {df.shape[1]} kolom")
-    print(f"Target      : {TARGET}")
-    print(df[["Gender", "Class", "Flight Distance", "Departure Delay in Minutes", TARGET]]
-          .head().to_string(index=False))
+    print(f"Target      : {TARGET} (MPa)")
+    print(df.head().to_string(index=False))
 
     # ---------------- 2. PREPROCESSING ----------------
     judul("2. PREPROCESSING")
-    miss = df.isna().sum()
-    print(">> Missing value:")
-    for k, v in miss[miss > 0].items():
-        print(f"     {k}: {v}")
-    # missing ada di kolom TARGET -> baris dihapus (target tidak boleh dikarang/diisi)
-    df = df.dropna(subset=[TARGET]).reset_index(drop=True)
-    print(f"   -> baris dengan target kosong dihapus, sisa {len(df)} baris")
-
+    print(f">> Missing value : {int(df.isna().sum().sum())} sel")
     dup = int(df.duplicated().sum())
-    print(f">> Duplikasi data: {dup} baris")
+    print(f">> Duplikasi     : {dup} baris")
     df = df.drop_duplicates().reset_index(drop=True)
+    print(f"   -> duplikat dihapus, sisa {len(df)} baris")
 
     print(">> Outlier (IQR):")
-    for c in ["Flight Distance", "Departure Delay in Minutes", TARGET]:
+    for c in df.columns:
         q1, q3 = df[c].quantile(0.25), df[c].quantile(0.75)
         iqr = q3 - q1
         n = int(((df[c] < q1 - 1.5 * iqr) | (df[c] > q3 + 1.5 * iqr)).sum())
-        print(f"     {c:<28}: {n:>6} baris (maks {df[c].max():.0f})")
-    print("   -> tidak dibuang: keterlambatan panjang adalah kejadian nyata,")
-    print("      bukan salah input, dan tetap mengikuti pola linear delay")
+        if n:
+            print(f"     {c:<30}: {n} baris")
+    print("   -> tidak dibuang: nilainya wajar untuk campuran beton (mis. umur")
+    print("      beton 180-365 hari), dan Gradient Boosting tahan terhadap outlier")
 
-    # one-hot encoding untuk kolom kategorikal (Linear Regression butuh angka)
-    kategori = df.select_dtypes(include="object").columns.tolist()
-    df = pd.get_dummies(df, columns=kategori, drop_first=True, dtype=int)
-    print(f">> One-hot encoding: {kategori}")
-    print(f"   -> total {df.shape[1] - 1} fitur")
+    # ---------------- 3. EKSPLORASI ----------------
+    judul("3. KORELASI FITUR DENGAN TARGET")
+    korelasi = df.corr()[TARGET].drop(TARGET).sort_values(ascending=False)
+    for f, r in korelasi.items():
+        print(f"   {f:<20}: {r:+.3f}")
 
-    # ---------------- 3. KORELASI ----------------
-    judul("3. KORELASI FITUR DENGAN TARGET (5 teratas)")
-    korelasi = df.corr()[TARGET].drop(TARGET).sort_values(key=abs, ascending=False)
-    for f, r in korelasi.head(5).items():
-        print(f"   {f:<34}: {r:+.3f}")
-
-    plt.figure(figsize=(8, 5))
-    plt.scatter(df["Departure Delay in Minutes"], df[TARGET], s=4, alpha=0.3, color="#3d7cc9")
-    plt.xlabel("Departure Delay in Minutes")
-    plt.ylabel(TARGET)
-    plt.title("Keterlambatan berangkat vs keterlambatan tiba")
-    tampilkan("reg_1_scatter_delay.png")
+    fig, ax = plt.subplots(1, 2, figsize=(15, 7))
+    sns.heatmap(df.corr(), annot=True, fmt=".2f", cmap="coolwarm", ax=ax[0],
+                annot_kws={"size": 7}, cbar=False)
+    ax[0].set_title("Matriks korelasi")
+    ax[1].scatter(df["age"], df[TARGET], s=10, alpha=0.5, color="#3d7cc9")
+    rata_umur = df.groupby("age")[TARGET].mean()
+    ax[1].plot(rata_umur.index, rata_umur.values, "r-o", ms=4, label="rata-rata per umur")
+    ax[1].set_xlabel("age (hari)")
+    ax[1].set_ylabel(f"{TARGET} (MPa)")
+    ax[1].set_title("Umur beton vs kuat tekan (hubungan tidak linear)")
+    ax[1].legend()
+    plt.tight_layout()
+    tampilkan("reg_1_eksplorasi.png")
 
     # ---------------- 4. SPLIT DATA ----------------
     judul("4. SPLIT DATA 80% TRAINING / 20% TESTING")
@@ -101,69 +108,69 @@ def main():
     print(f"   Training : {len(X_train)} baris")
     print(f"   Testing  : {len(X_test)} baris")
 
-    # ---------------- 5. LINEAR REGRESSION ----------------
-    judul("5. MODEL LINEAR REGRESSION")
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-    print(f"   Intercept : {model.intercept_:.4f}")
-    koef = pd.Series(model.coef_, index=X.columns).sort_values(key=abs, ascending=False)
-    print("   Koefisien 5 fitur paling berpengaruh:")
-    for f, k in koef.head(5).items():
-        print(f"     {f:<34}: {k:+.4f}")
+    # ---------------- 5. PEMODELAN ----------------
+    judul("5. PEMODELAN")
+    linear = LinearRegression().fit(X_train, y_train)
+    print("   Linear Regression (pembanding) selesai dilatih")
+    gbr = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=3,
+                                    random_state=42)
+    gbr.fit(X_train, y_train)
+    print("   Gradient Boosting Regressor selesai dilatih")
+    print("     n_estimators=100 | learning_rate=0.1 | max_depth=3")
 
     # ---------------- 6. EVALUASI ----------------
-    judul("6. EVALUASI MODEL")
-    pred_train = model.predict(X_train)
-    pred = model.predict(X_test)
-    mae = mean_absolute_error(y_test, pred)
-    mse = mean_squared_error(y_test, pred)
-    rmse = np.sqrt(mse)
-    r2 = r2_score(y_test, pred)
-    print(f"   MAE  : {mae:.4f} menit")
-    print(f"   MSE  : {mse:.4f}")
-    print(f"   RMSE : {rmse:.4f} menit")
-    print(f"   R2   : {r2:.4f}  (data training: {r2_score(y_train, pred_train):.4f})")
-    pd.DataFrame({"Metrik": ["MAE", "MSE", "RMSE", "R2"], "Nilai": [mae, mse, rmse, r2]}).to_csv(
-        os.path.join(OUT_DIR, "evaluasi.csv"), index=False)
+    judul("6. EVALUASI MODEL (data testing)")
+    hasil = {
+        "Linear Regression": evaluasi(y_test, linear.predict(X_test)),
+        "Gradient Boosting": evaluasi(y_test, gbr.predict(X_test)),
+    }
+    tabel = pd.DataFrame(hasil).T
+    print(tabel.round(4).to_string())
+    r2_train = r2_score(y_train, gbr.predict(X_train))
+    print(f"\n   R2 Gradient Boosting data training: {r2_train:.4f}")
+    tabel.to_csv(os.path.join(OUT_DIR, "evaluasi.csv"))
 
-    fig, ax = plt.subplots(1, 2, figsize=(13, 5))
-    ax[0].scatter(y_test, pred, s=5, alpha=0.3, color="#3d7cc9")
-    batas = [0, max(y_test.max(), pred.max())]
-    ax[0].plot(batas, batas, "r--", label="prediksi = aktual")
-    ax[0].set_xlabel("Arrival Delay aktual (menit)")
-    ax[0].set_ylabel("Arrival Delay prediksi (menit)")
-    ax[0].set_title(f"Aktual vs Prediksi (R2 = {r2:.3f})")
-    ax[0].legend()
-    residu = y_test - pred
-    ax[1].hist(residu, bins=80, range=(-80, 80), color="#8fb3e0", edgecolor="white")
-    ax[1].axvline(0, color="red", ls="--")
-    ax[1].set_xlabel("Residu = aktual - prediksi (menit)")
-    ax[1].set_ylabel("Jumlah data")
-    ax[1].set_title("Sebaran residu")
+    pred_lin, pred_gbr = linear.predict(X_test), gbr.predict(X_test)
+    fig, ax = plt.subplots(1, 2, figsize=(13, 5), sharey=True)
+    for a, p, nama in [(ax[0], pred_lin, "Linear Regression"), (ax[1], pred_gbr, "Gradient Boosting")]:
+        a.scatter(y_test, p, s=14, alpha=0.6, color="#3d7cc9")
+        a.plot([0, 85], [0, 85], "r--", label="prediksi = aktual")
+        a.set_xlabel("Kuat tekan aktual (MPa)")
+        a.set_title(f"{nama} (R2 = {r2_score(y_test, p):.3f})")
+        a.legend()
+    ax[0].set_ylabel("Kuat tekan prediksi (MPa)")
     plt.tight_layout()
     tampilkan("reg_2_aktual_vs_prediksi.png")
 
-    plt.figure(figsize=(9, 5))
-    top = koef.head(10).iloc[::-1]
-    plt.barh(top.index, top.values, color=["#d66b6b" if v > 0 else "#5b8fd6" for v in top.values])
-    plt.axvline(0, color="black", lw=0.8)
-    plt.xlabel("Koefisien (menit per satuan fitur)")
-    plt.title("10 koefisien Linear Regression terbesar")
-    plt.tight_layout()
-    tampilkan("reg_3_koefisien.png")
+    # ---------------- 7. FEATURE IMPORTANCE ----------------
+    judul("7. FEATURE IMPORTANCE GRADIENT BOOSTING")
+    penting = pd.Series(gbr.feature_importances_, index=X.columns).sort_values(ascending=False)
+    for f, v in penting.items():
+        print(f"   {f:<20}: {v * 100:5.1f}%")
 
-    # ---------------- 7. CONTOH PREDIKSI ----------------
-    judul("7. CONTOH PREDIKSI (5 data testing)")
-    contoh = pd.DataFrame({
-        "Departure Delay": X_test["Departure Delay in Minutes"].values[:5],
-        "Arrival Delay asli": y_test.values[:5],
-        "Prediksi": pred[:5].round(1),
-    })
-    contoh["Selisih"] = (contoh["Arrival Delay asli"] - contoh["Prediksi"]).round(1)
+    plt.figure(figsize=(9, 4.5))
+    penting.iloc[::-1].mul(100).plot(kind="barh", color="#3d7cc9")
+    plt.xlabel("Kontribusi (%)")
+    plt.title("Feature importance Gradient Boosting")
+    plt.tight_layout()
+    tampilkan("reg_3_feature_importance.png")
+
+    # ---------------- 8. CONTOH PREDIKSI ----------------
+    judul("8. CONTOH PREDIKSI (5 data testing)")
+    contoh = X_test.head(5)[["cement", "water", "age"]].copy()
+    contoh["Aktual"] = y_test.head(5).values
+    contoh["Prediksi"] = pred_gbr[:5].round(2)
+    contoh["Selisih"] = (contoh["Aktual"] - contoh["Prediksi"]).round(2)
     print(contoh.to_string(index=False))
 
-    hasil = X_test.assign(**{"Arrival Delay asli": y_test.values, "Prediksi": pred.round(2)})
-    hasil.to_csv(os.path.join(OUT_DIR, "hasil_prediksi.csv"), index=False)
+    campuran = pd.DataFrame([{"cement": 350, "blast_furnace_slag": 100, "fly_ash": 0, "water": 180,
+                              "superplasticizer": 8, "coarse_aggregate": 950,
+                              "fine_aggregate": 750, "age": 28}])[X.columns]
+    print("\n   Campuran baru (semen 350, slag 100, air 180, superplasticizer 8, umur 28 hari)")
+    print(f"   Prediksi kuat tekan: {gbr.predict(campuran)[0]:.2f} MPa")
+
+    X_test.assign(Aktual=y_test.values, Prediksi=pred_gbr.round(2)).to_csv(
+        os.path.join(OUT_DIR, "hasil_prediksi.csv"), index=False)
     print("\nHasil disimpan -> output/hasil_prediksi.csv, output/evaluasi.csv")
 
 
