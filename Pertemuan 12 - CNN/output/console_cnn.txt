@@ -1,0 +1,222 @@
+
+==============================================================
+  2. LOAD DATASET
+==============================================================
+Jumlah gambar : 27000 | Jumlah kelas : 10
+   0. AnnualCrop            (tanaman semusim ): 3000 gambar
+   1. Forest                (hutan           ): 3000 gambar
+   2. HerbaceousVegetation  (vegetasi herba  ): 3000 gambar
+   3. Highway               (jalan raya      ): 2500 gambar
+   4. Industrial            (kawasan industri): 2500 gambar
+   5. Pasture               (padang rumput   ): 2000 gambar
+   6. PermanentCrop         (tanaman tahunan ): 2500 gambar
+   7. Residential           (perumahan       ): 3000 gambar
+   8. River                 (sungai          ): 2500 gambar
+   9. SeaLake               (laut / danau    ): 3000 gambar
+
+==============================================================
+  3. BACA GAMBAR
+==============================================================
+   Shape data     : (27000, 64, 64, 3)  (gambar, tinggi, lebar, channel RGB)
+   Ukuran gambar  : {(64, 64)}
+   File rusak     : 0
+   Rentang piksel : 0 - 255 (dinormalisasi ke 0-1 di dalam model)
+   Waktu baca     : 20.0 detik
+
+==============================================================
+  4. SPLIT DATA 70% TRAIN / 15% VALIDASI / 15% TEST
+==============================================================
+   Training : 18900 gambar
+   Validasi : 4050 gambar
+   Testing  : 4050 gambar
+
+==============================================================
+  5. ARSITEKTUR CNN
+==============================================================
+Model: "cnn_eurosat"
+┌─────────────────────────────────┬────────────────────────┬───────────────┐
+│ Layer (type)                    │ Output Shape           │       Param # │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ augmentasi (Sequential)         │ (None, 64, 64, 3)      │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ rescaling (Rescaling)           │ (None, 64, 64, 3)      │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d (Conv2D)                 │ (None, 64, 64, 32)     │           896 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization             │ (None, 64, 64, 32)     │           128 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ activation (Activation)         │ (None, 64, 64, 32)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d (MaxPooling2D)    │ (None, 32, 32, 32)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d_1 (Conv2D)               │ (None, 32, 32, 64)     │        18,496 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_1           │ (None, 32, 32, 64)     │           256 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ activation_1 (Activation)       │ (None, 32, 32, 64)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d_1 (MaxPooling2D)  │ (None, 16, 16, 64)     │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d_2 (Conv2D)               │ (None, 16, 16, 128)    │        73,856 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_2           │ (None, 16, 16, 128)    │           512 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ activation_2 (Activation)       │ (None, 16, 16, 128)    │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d_2 (MaxPooling2D)  │ (None, 8, 8, 128)      │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout (Dropout)               │ (None, 8, 8, 128)      │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d_3 (Conv2D)               │ (None, 8, 8, 256)      │       295,168 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_3           │ (None, 8, 8, 256)      │         1,024 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ activation_3 (Activation)       │ (None, 8, 8, 256)      │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ global_average_pooling2d        │ (None, 256)            │             0 │
+│ (GlobalAveragePooling2D)        │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_1 (Dropout)             │ (None, 256)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense (Dense)                   │ (None, 128)            │        32,896 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 10)             │         1,290 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 424,522 (1.62 MB)
+ Trainable params: 423,562 (1.62 MB)
+ Non-trainable params: 960 (3.75 KB)
+
+==============================================================
+  6. COMPILE DAN TRAIN
+==============================================================
+Epoch 1/40
+296/296 - 66s - 223ms/step - accuracy: 0.6715 - loss: 0.9235 - val_accuracy: 0.1654 - val_loss: 4.9088 - learning_rate: 0.0010
+Epoch 2/40
+296/296 - 60s - 201ms/step - accuracy: 0.7616 - loss: 0.6638 - val_accuracy: 0.4074 - val_loss: 2.1825 - learning_rate: 0.0010
+Epoch 3/40
+296/296 - 59s - 200ms/step - accuracy: 0.7957 - loss: 0.5790 - val_accuracy: 0.5595 - val_loss: 1.4840 - learning_rate: 0.0010
+Epoch 4/40
+296/296 - 55s - 186ms/step - accuracy: 0.8143 - loss: 0.5242 - val_accuracy: 0.5104 - val_loss: 1.9117 - learning_rate: 0.0010
+Epoch 5/40
+296/296 - 56s - 189ms/step - accuracy: 0.8358 - loss: 0.4734 - val_accuracy: 0.7615 - val_loss: 0.8526 - learning_rate: 0.0010
+Epoch 6/40
+296/296 - 55s - 185ms/step - accuracy: 0.8489 - loss: 0.4310 - val_accuracy: 0.6583 - val_loss: 1.1488 - learning_rate: 0.0010
+Epoch 7/40
+296/296 - 55s - 187ms/step - accuracy: 0.8644 - loss: 0.3936 - val_accuracy: 0.7247 - val_loss: 0.8607 - learning_rate: 0.0010
+Epoch 8/40
+296/296 - 57s - 191ms/step - accuracy: 0.8767 - loss: 0.3643 - val_accuracy: 0.4960 - val_loss: 1.7732 - learning_rate: 0.0010
+Epoch 9/40
+296/296 - 54s - 182ms/step - accuracy: 0.8990 - loss: 0.2875 - val_accuracy: 0.8484 - val_loss: 0.4283 - learning_rate: 5.0000e-04
+Epoch 10/40
+296/296 - 53s - 180ms/step - accuracy: 0.9058 - loss: 0.2715 - val_accuracy: 0.8188 - val_loss: 0.4807 - learning_rate: 5.0000e-04
+Epoch 11/40
+296/296 - 53s - 180ms/step - accuracy: 0.9132 - loss: 0.2561 - val_accuracy: 0.8798 - val_loss: 0.3407 - learning_rate: 5.0000e-04
+Epoch 12/40
+296/296 - 55s - 185ms/step - accuracy: 0.9135 - loss: 0.2474 - val_accuracy: 0.8669 - val_loss: 0.3787 - learning_rate: 5.0000e-04
+Epoch 13/40
+296/296 - 52s - 176ms/step - accuracy: 0.9181 - loss: 0.2400 - val_accuracy: 0.7494 - val_loss: 0.7676 - learning_rate: 5.0000e-04
+Epoch 14/40
+296/296 - 51s - 173ms/step - accuracy: 0.9188 - loss: 0.2326 - val_accuracy: 0.7462 - val_loss: 0.8080 - learning_rate: 5.0000e-04
+Epoch 15/40
+296/296 - 52s - 176ms/step - accuracy: 0.9321 - loss: 0.1971 - val_accuracy: 0.8941 - val_loss: 0.3499 - learning_rate: 2.5000e-04
+Epoch 16/40
+296/296 - 52s - 175ms/step - accuracy: 0.9354 - loss: 0.1918 - val_accuracy: 0.8998 - val_loss: 0.3028 - learning_rate: 2.5000e-04
+Epoch 17/40
+296/296 - 51s - 174ms/step - accuracy: 0.9357 - loss: 0.1849 - val_accuracy: 0.7659 - val_loss: 0.8042 - learning_rate: 2.5000e-04
+Epoch 18/40
+296/296 - 52s - 177ms/step - accuracy: 0.9373 - loss: 0.1802 - val_accuracy: 0.8210 - val_loss: 0.5750 - learning_rate: 2.5000e-04
+Epoch 19/40
+296/296 - 53s - 180ms/step - accuracy: 0.9390 - loss: 0.1737 - val_accuracy: 0.8699 - val_loss: 0.4152 - learning_rate: 2.5000e-04
+Epoch 20/40
+296/296 - 57s - 193ms/step - accuracy: 0.9439 - loss: 0.1611 - val_accuracy: 0.8817 - val_loss: 0.3432 - learning_rate: 1.2500e-04
+Epoch 21/40
+296/296 - 55s - 185ms/step - accuracy: 0.9471 - loss: 0.1544 - val_accuracy: 0.8575 - val_loss: 0.4397 - learning_rate: 1.2500e-04
+Epoch 22/40
+296/296 - 54s - 182ms/step - accuracy: 0.9468 - loss: 0.1553 - val_accuracy: 0.9017 - val_loss: 0.2906 - learning_rate: 1.2500e-04
+Epoch 23/40
+296/296 - 53s - 178ms/step - accuracy: 0.9472 - loss: 0.1531 - val_accuracy: 0.8600 - val_loss: 0.4469 - learning_rate: 1.2500e-04
+Epoch 24/40
+296/296 - 55s - 185ms/step - accuracy: 0.9498 - loss: 0.1480 - val_accuracy: 0.8691 - val_loss: 0.3934 - learning_rate: 1.2500e-04
+Epoch 25/40
+296/296 - 54s - 183ms/step - accuracy: 0.9472 - loss: 0.1487 - val_accuracy: 0.8983 - val_loss: 0.3146 - learning_rate: 1.2500e-04
+Epoch 26/40
+296/296 - 53s - 179ms/step - accuracy: 0.9493 - loss: 0.1434 - val_accuracy: 0.8956 - val_loss: 0.3111 - learning_rate: 6.2500e-05
+Epoch 27/40
+296/296 - 54s - 183ms/step - accuracy: 0.9530 - loss: 0.1378 - val_accuracy: 0.8798 - val_loss: 0.3733 - learning_rate: 6.2500e-05
+Epoch 28/40
+296/296 - 54s - 184ms/step - accuracy: 0.9549 - loss: 0.1310 - val_accuracy: 0.8758 - val_loss: 0.4006 - learning_rate: 6.2500e-05
+
+Training selesai: 28 epoch, 1532 detik
+Bobot terbaik dari epoch 22 dipakai (EarlyStopping)
+
+==============================================================
+  7. EVALUASI DATA TEST
+==============================================================
+Akurasi di data uji: 91.19%
+Loss di data uji   : 0.2810
+
+==============================================================
+  8. CONFUSION MATRIX
+==============================================================
+        Annual  Forest  Herbac  Highwa  Indust  Pastur  Perman  Reside  River  SeaLak
+Annual     398       3       2       3       0       3      33       1      7       0
+Forest       0     448       0       0       0       0       0       2      0       0
+Herbac       0      12     362       2       3       0      31      34      6       0
+Highwa       2       0       1     327      10       2       5      21      7       0
+Indust       0       0       0       0     317       0       0      58      0       0
+Pastur       3      16       2       0       0     273       5       0      1       0
+Perman       1       1       6       3       3       0     345      12      4       0
+Reside       0       0       0       0       0       0       0     450      0       0
+River        3       3       0       4       0       4      13       3    345       0
+SeaLak       5       9       0       0       0       3       0       0      5     428
+
+Pasangan kelas yang paling sering tertukar (aktual -> prediksi):
+   Industrial            -> Residential          : 58 gambar
+   HerbaceousVegetation  -> Residential          : 34 gambar
+   AnnualCrop            -> PermanentCrop        : 33 gambar
+   HerbaceousVegetation  -> PermanentCrop        : 31 gambar
+   Highway               -> Residential          : 21 gambar
+
+==============================================================
+  9. LAPORAN KLASIFIKASI
+==============================================================
+                      precision    recall  f1-score   support
+
+          AnnualCrop     0.9660    0.8844    0.9234       450
+              Forest     0.9106    0.9956    0.9512       450
+HerbaceousVegetation     0.9705    0.8044    0.8797       450
+             Highway     0.9646    0.8720    0.9160       375
+          Industrial     0.9520    0.8453    0.8955       375
+             Pasture     0.9579    0.9100    0.9333       300
+       PermanentCrop     0.7986    0.9200    0.8550       375
+         Residential     0.7745    1.0000    0.8729       450
+               River     0.9200    0.9200    0.9200       375
+             SeaLake     1.0000    0.9511    0.9749       450
+
+            accuracy                         0.9119      4050
+           macro avg     0.9215    0.9103    0.9122      4050
+        weighted avg     0.9211    0.9119    0.9126      4050
+
+
+==============================================================
+  10. CONTOH PREDIKSI
+==============================================================
+   BENAR | asli Pasture               | prediksi Pasture               | yakin 100.0%
+   BENAR | asli Pasture               | prediksi Pasture               | yakin 100.0%
+   BENAR | asli Residential           | prediksi Residential           | yakin 100.0%
+   BENAR | asli AnnualCrop            | prediksi AnnualCrop            | yakin  80.1%
+   BENAR | asli AnnualCrop            | prediksi AnnualCrop            | yakin  92.2%
+   BENAR | asli SeaLake               | prediksi SeaLake               | yakin 100.0%
+   BENAR | asli Pasture               | prediksi Pasture               | yakin  93.5%
+   BENAR | asli AnnualCrop            | prediksi AnnualCrop            | yakin  99.4%
+   BENAR | asli Residential           | prediksi Residential           | yakin 100.0%
+   SALAH | asli HerbaceousVegetation  | prediksi Forest                | yakin  58.6%
+   SALAH | asli HerbaceousVegetation  | prediksi Residential           | yakin  98.3%
+   SALAH | asli Highway               | prediksi Residential           | yakin  99.6%
+
+Model disimpan -> output/model_cnn_eurosat.keras
+EXIT 0

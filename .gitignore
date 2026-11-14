@@ -9,3 +9,7 @@ Thumbs.db
 
 # Arsip lama / folder duplikat
 _arsip/
+
+# Dataset gambar besar (unduh ulang dari link di laporan)
+Pertemuan 12 - CNN/EuroSAT_RGB/
+Pertemuan 12 - CNN/output/model_cnn_eurosat.keras
